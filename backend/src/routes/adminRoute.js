@@ -1,5 +1,5 @@
 const express=require('express');
-const { handleAdminSignup, handleAdminLogin } = require('../controllers/authController');
+const { handleAdminSignup, handleAdminLogin } = require('../controllers/adminController');
 const router=express.Router();
 
 router.post('/admin_signup',handleAdminSignup);

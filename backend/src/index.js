@@ -3,7 +3,7 @@ dotenv.config();
 const express=require('express');
 const cookieParser=require('cookie-parser');
 const {connectDb}=require('./lib/connectDb');
-const authRouter=require('./routes/authRoute');
+const adminRouter=require('./routes/adminRoute');
 
 
 
@@ -26,7 +26,7 @@ app.use(express.urlencoded({extended:false}));
 
 
 //routes
-app.use('/api/auth',authRouter);
+app.use('/api/auth',adminRouter);
 
 
 
