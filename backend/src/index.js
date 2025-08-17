@@ -4,7 +4,7 @@ const express=require('express');
 const cookieParser=require('cookie-parser');
 const {connectDb}=require('./lib/connectDb');
 const adminRouter=require('./routes/adminRoute');
-
+const employeeManageRoute=require('./routes/employeeManagementRoute');
 
 
 const app=express();
@@ -28,7 +28,7 @@ app.use(express.urlencoded({extended:false}));
 //routes
 app.use('/api/auth',adminRouter);
 
-
+app.use('/api/employee',employeeManageRoute);
 
 app.listen(PORT,()=>{
     console.log(`Server running at port ${PORT}`);
