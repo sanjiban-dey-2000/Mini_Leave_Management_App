@@ -51,6 +51,39 @@ async function handleAddingEmployees(req,res){
     }
 }
 
+//employee signup handler
+async function handleEmployeeSingup(req,res){
+    try{
+        const {email,password}=req.body;
+        if(!email||!password){
+            return res.status(400).json({
+                message:"Please provide all the fields",
+            });
+        }
+        const existingEmployee=await Employee.findOne({email});
+        if(!existingEmployee){
+            return res.status(404).json({
+                message:"Your email id is not added in the system.Please contact your HR"
+            });
+        }
+
+        existingEmployee.password=password;
+        existingEmployee.save();
+
+        res.status(201).json({
+            message:"Your account password is created.Now you can login",
+            existingEmployee,
+        });
+        
+    }catch(error){
+        console.log(error.message);
+        res.status(500).json({
+            message:"Internal server error in employee signup route",
+        });
+    }
+}
+
 module.exports={
     handleAddingEmployees,
+    handleEmployeeSingup,
 };
