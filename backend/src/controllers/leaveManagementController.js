@@ -131,8 +131,32 @@ async function handleLeaveApplicationStatus(req,res){
     }
 }
 
+//application status view controller(employee end)
+async function handleViewApplicationStatus(req,res){
+    try{
+        const leaveStatus=await Leave.find({employeeId:req.user._id});
+
+        if(!leaveStatus){
+            return res.status(400).json({
+                message:"No application is there to view",
+            });
+        }
+
+        res.status(200).json({
+            message:"Application status fetched successfully",
+            leaveStatus
+        });
+    }catch(error){
+        console.log(error.message);
+        res.status(500).json({
+            message:"Internal server error in viewing application status route",
+        });
+    }
+}
+
 module.exports={
     handleLeaveApplication,
     handleViewLeaveApplications,
     handleLeaveApplicationStatus,
+    handleViewApplicationStatus,
 }
