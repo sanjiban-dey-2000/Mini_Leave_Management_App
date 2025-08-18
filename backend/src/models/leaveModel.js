@@ -46,11 +46,6 @@ const leaveSchema=new mongoose.Schema({
     leaveBalanceAfter:{
         type:Number,
     },
-    documents:[
-        {
-            type:String,
-        }
-    ],
 },{
     timestamps:true,
 });
