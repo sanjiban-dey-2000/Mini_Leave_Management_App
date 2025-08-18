@@ -1,7 +1,7 @@
 // src/pages/admin/AdminHome.jsx
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { addEmployee } from "../service/axiosInstance";
+import { addEmployee, getLeave } from "../service/axiosInstance";
 
 const AdminHome = () => {
   const [formData, setFormData] = useState({
@@ -41,8 +41,18 @@ const AdminHome = () => {
     });
   };
 
-  useEffect(()=>{
+  const gettingLeaveApplicationDetails=async()=>{
+    try{
+      const res=await getLeave();
+      console.log(res.data);
+      setLeaves(res.data.leaves);
+    }catch(error){
+      console.log(error.message);
+    }
+  }
 
+  useEffect(()=>{
+    gettingLeaveApplicationDetails();
   },[]);
 
   return (
@@ -127,7 +137,7 @@ const AdminHome = () => {
           <tbody>
             {leaves.map((leave) => (
               <tr key={leave._id} className="text-center">
-                <td className="border px-3 py-2">{leave.employeeName}</td>
+                <td className="border px-3 py-2">{leave.employeeId.fullName}</td>
                 <td className="border px-3 py-2">{leave.leaveType}</td>
                 <td className="border px-3 py-2">
                   {new Date(leave.startDate).toLocaleDateString()}

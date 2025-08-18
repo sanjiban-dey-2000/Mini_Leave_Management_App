@@ -16,3 +16,7 @@ export const adminLogin=async(data)=>{
 export const addEmployee=async(data)=>{
     return await api.post('/employee/add_employee',data);
 }
+
+export const getLeave=async()=>{
+    return await api.get('/leave/view_requests');
+}
