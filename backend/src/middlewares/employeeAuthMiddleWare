@@ -1,0 +1,40 @@
+const Employee=require('../models/employeeModel');
+const jwt=require('jsonwebtoken');
+
+async function protectEmployeeRoute(req,res,next){
+    try{
+        const token=req.cookies.jwt;
+        if(!token){
+            return res.status(401).json({
+                message:"Unauthorized. No tokens provided",
+            });
+        }
+
+        const decoded= jwt.verify(token,process.env.JWT_SECRET_KEY);
+
+        if(!decoded){
+            return res.status(401).json({
+                message:"Unauthorized. invalid token",
+            });
+        }
+
+        const employee=await Employee.findById(decoded.userId).select("-password");
+        if(!employee){
+            return res.status(401).json({
+                message:"Unauthorized. Admin not found",
+            });
+        }
+
+        req.user=employee;
+        next();
+    }catch(error){
+        console.log(error.message);
+        res.status(401).json({
+            message:"Unauthorized. Invalid or expired token",
+        });
+    }
+}
+
+module.exports={
+    protectEmployeeRoute,
+}
