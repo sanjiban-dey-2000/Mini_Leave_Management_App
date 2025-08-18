@@ -32,3 +32,11 @@ export const employeeSignup=async(data)=>{
 export const employeeLogin=async(data)=>{
     return await api.post('/employee/login',data);
 }
+
+export const applyLeave=async(data)=>{
+    return await api.post('/leave/apply',data);
+}
+
+export const getEmployeeLeaves=async()=>{
+    return await api.get('/leave/view_status');
+}

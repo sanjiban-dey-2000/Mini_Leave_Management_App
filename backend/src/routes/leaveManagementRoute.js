@@ -1,6 +1,6 @@
 const express=require('express');
 const { protectEmployeeRoute } = require('../middlewares/employeeAuthMiddleWare');
-const { handleLeaveApplication, handleViewLeaveApplications, handleLeaveApplicationStatus, handleViewApplicationStatus } = require('../controllers/leaveManagementController');
+const { handleLeaveApplication, handleViewLeaveApplications, handleLeaveApplicationStatus, handleViewApplicationStatus, handleViewLeavesDetails } = require('../controllers/leaveManagementController');
 const { protectRoute } = require('../middlewares/adminMiddleware');
 const router=express.Router();
 

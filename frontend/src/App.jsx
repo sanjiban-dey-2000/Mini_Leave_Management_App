@@ -8,6 +8,8 @@ import AdminProtectRoute from './middleware/AdminProtectRoute';
 import AdminDashboard from './components/layouts/AdminDashboard';
 import AdminHome from './pages/AdminHome';
 import EmployeeAuthPage from './pages/EmployeeAuthPage';
+import EmployeeDashboard from './components/layouts/EmployeeDashboard';
+import EmployeeHome from './pages/EmployeeHome';
 
 
 const App = () => {
@@ -39,6 +41,16 @@ const App = () => {
           index: true,
           element: <AdminHome/>,
         },
+      ]
+    },
+    {
+      path:"/employee_dashboard",
+      element:<EmployeeDashboard/>,
+      children:[
+        {
+          index:true,
+          element:<EmployeeHome/>
+        }
       ]
     }
   ]);
