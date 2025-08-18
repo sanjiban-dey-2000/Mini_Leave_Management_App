@@ -24,3 +24,11 @@ export const getLeave=async()=>{
 export const approveLeave = async (leaveId, status) => {
     return await api.post(`/leave/update_application/${leaveId}`, { status });
 };
+
+export const employeeSignup=async(data)=>{
+    return await api.post('/employee/signup',data);
+}
+
+export const employeeLogin=async(data)=>{
+    return await api.post('/employee/login',data);
+}

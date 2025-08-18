@@ -7,6 +7,7 @@ import AdminAuthPage from './pages/AdminAuthPage';
 import AdminProtectRoute from './middleware/AdminProtectRoute';
 import AdminDashboard from './components/layouts/AdminDashboard';
 import AdminHome from './pages/AdminHome';
+import EmployeeAuthPage from './pages/EmployeeAuthPage';
 
 
 const App = () => {
@@ -23,6 +24,10 @@ const App = () => {
         {
           path:"/admin-login",
           element:<AdminAuthPage/>
+        },
+        {
+          path:"/employee-login",
+          element:<EmployeeAuthPage/>
         }
       ]
     },
