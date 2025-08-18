@@ -5,8 +5,9 @@ const Employee=require('../models/employeeModel');
 async function handleLeaveApplication(req,res){
     try{
         const {leaveType,startDate,endDate,numberOfDays,reason}=req.body;
-        const existingEmployee=await Employee.findById(req.user._id);
 
+        //edge cases
+        const existingEmployee=await Employee.findById(req.user._id);
         if(!existingEmployee){
             return res.status(404).json({
                 message:"Employee not found",
@@ -23,6 +24,8 @@ async function handleLeaveApplication(req,res){
                 message:"Insufficient leave balance",
             });
         }
+
+        //creating leave application
         const leave=await Leave.create({
             employeeId:req.user._id,
             leaveType,
@@ -34,6 +37,7 @@ async function handleLeaveApplication(req,res){
             leaveBalanceAfter:existingEmployee.totalLeaves-numberOfDays,
         });
 
+        //updating employee model
         existingEmployee.totalLeaves-=numberOfDays;
         await existingEmployee.save();
 
@@ -49,6 +53,24 @@ async function handleLeaveApplication(req,res){
     }
 }
 
+//all leave application view controller (admin end)
+async function handleViewLeaveApplications(req,res){
+    try{
+        const leaves=await Leave.find().populate('employeeId', 'fullName email department joiningDate').sort({createdAt:-1});
+
+        res.status(200).json({
+            message:"All leave requests fetched successfully",
+            leaves,
+        });
+    }catch(error){
+        console.log(error.message);
+        res.status(500).json({
+            message:"Internal server error in viewing applications route",
+        });
+    }
+}
+
 module.exports={
     handleLeaveApplication,
+    handleViewLeaveApplications,
 }
