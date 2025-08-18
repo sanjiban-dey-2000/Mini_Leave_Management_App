@@ -1,5 +1,7 @@
 const Employee=require('../models/employeeModel');
 const sendEmail = require('../utils/sendEmail');
+const jwt=require('jsonwebtoken');
+const bcrypt=require('bcrypt');
 
 //new employee adding handler
 async function handleAddingEmployees(req,res){
@@ -74,7 +76,7 @@ async function handleEmployeeSingup(req,res){
             message:"Your account password is created.Now you can login",
             existingEmployee,
         });
-        
+
     }catch(error){
         console.log(error.message);
         res.status(500).json({
@@ -83,7 +85,54 @@ async function handleEmployeeSingup(req,res){
     }
 }
 
+//employee login handler
+async function handleEmployeeLogin(req,res){
+    try{
+        const {email,password}=req.body;
+        if(!email||!password){
+            return res.status(400).json({
+                message:"Please provide all the fields",
+            });
+        }
+
+        const existingEmployee=await Employee.findOne({email});
+        if(!existingEmployee){
+            return res.status(404).json({
+                message:"Employee not found",
+            });
+        }
+        const isMatched=await bcrypt.compare(password,existingEmployee.password);
+        if(!isMatched){
+            return res.status(403).json({
+                message:"Incorrect password provided",
+            });
+        }
+
+        const token=await jwt.sign({userId:existingEmployee._id},process.env.JWT_SECRET_KEY,{
+            expiresIn:"7d",
+        });
+
+        res.cookie("jwt",token,{
+            maxAge:7*24*60*60*1000,
+            httpOnly:true,
+            sameSite:"strict",
+        });
+
+        res.status(200).json({
+            message:"Logged in successfully",
+            existingEmployee,
+        });
+    }catch(error){
+        console.log(error.message);
+        res.status(500).json({
+            message:"Internal server error in employee login route",
+            error,
+        });
+    }
+}
+
 module.exports={
     handleAddingEmployees,
     handleEmployeeSingup,
+    handleEmployeeLogin,
 };
