@@ -2,6 +2,7 @@ const dotenv=require('dotenv');
 dotenv.config();
 const express=require('express');
 const cookieParser=require('cookie-parser');
+const cors=require('cors');
 const {connectDb}=require('./lib/connectDb');
 const adminRouter=require('./routes/adminRoute');
 const employeeManageRoute=require('./routes/employeeManagementRoute');
@@ -18,6 +19,12 @@ connectDb(MONGO_URI).then(()=>{
 }).catch((err)=>{
     console.log(`Error in database connectivity due to ${err.message}`);
 })
+
+//frontend and backend connectivity
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true,
+}));
 
 //middlewares
 app.use(express.json());
