@@ -4,6 +4,9 @@ import PublicLayout from './components/layouts/PublicLayout';
 import LandingPage from './pages/LandingPage';
 import PublicErrorPage from './pages/PublicErrorPage';
 import AdminAuthPage from './pages/AdminAuthPage';
+import AdminProtectRoute from './middleware/AdminProtectRoute';
+import AdminDashboard from './components/layouts/AdminDashboard';
+import AdminHome from './pages/AdminHome';
 
 
 const App = () => {
@@ -21,6 +24,16 @@ const App = () => {
           path:"/admin-login",
           element:<AdminAuthPage/>
         }
+      ]
+    },
+    {
+      path:"/admin_dashboard",
+      element:<AdminDashboard/>,
+       children: [
+        {
+          index: true,
+          element: <AdminHome/>,
+        },
       ]
     }
   ]);

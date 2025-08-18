@@ -58,8 +58,10 @@ const AdminAuthPage = () => {
     try {
       const res = await adminLogin(data);
       console.log(res.data);
-      newUser(res.data?.admin);
-      navigate("/admin_dashboard");
+      if (res.data.admin) {
+        newUser(res.data.admin); 
+        navigate("/admin_dashboard"); 
+      }
       toast.success(res.data?.message);
     } catch (error) {
       console.log(error.message);

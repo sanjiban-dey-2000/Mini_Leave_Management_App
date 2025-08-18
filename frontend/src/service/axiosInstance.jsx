@@ -12,3 +12,7 @@ export const adminSingup=async(data)=>{
 export const adminLogin=async(data)=>{
     return await api.post('/auth/admin_login',data);
 }
+
+export const addEmployee=async(data)=>{
+    return await api.post('/employee/add_employee',data);
+}

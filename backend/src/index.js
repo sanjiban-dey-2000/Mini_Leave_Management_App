@@ -39,6 +39,13 @@ app.use('/api/employee',employeeManageRoute);
 
 app.use('/api/leave',leaveManagementRoute);
 
+//verification route
+app.get('/api/user/verify',(req,res)=>{
+    res.status(200).json({
+        user:req.user,
+    });
+});
+
 app.listen(PORT,()=>{
     console.log(`Server running at port ${PORT}`);
 })
