@@ -1,6 +1,6 @@
 const express=require('express');
 const { protectEmployeeRoute } = require('../middlewares/employeeAuthMiddleWare');
-const { handleLeaveApplication, handleViewLeaveApplications } = require('../controllers/leaveManagementController');
+const { handleLeaveApplication, handleViewLeaveApplications, handleLeaveApplicationStatus } = require('../controllers/leaveManagementController');
 const { protectRoute } = require('../middlewares/adminMiddleware');
 const router=express.Router();
 
@@ -10,7 +10,7 @@ router.post('/apply',protectEmployeeRoute,handleLeaveApplication);
 //get leave application route(admin end)
 router.get('/view_requests',protectRoute,handleViewLeaveApplications);
 
-//leave application handling route(admin end)
-router.post('/update_application',protectRoute,)
+//leave application approval route(admin end)
+router.post('/update_application/:leaveId',protectRoute,handleLeaveApplicationStatus);
 
 module.exports=router;

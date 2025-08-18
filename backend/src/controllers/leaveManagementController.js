@@ -1,5 +1,6 @@
 const Leave=require('../models/leaveModel');
 const Employee=require('../models/employeeModel');
+const sendEmail=require('../utils/sendEmail');
 
 //leave application handler
 async function handleLeaveApplication(req,res){
@@ -70,7 +71,68 @@ async function handleViewLeaveApplications(req,res){
     }
 }
 
+//leave application approval controller(admin end)
+async function handleLeaveApplicationStatus(req,res){
+    try{
+        const {status}=req.body;
+        const {leaveId}=req.params;
+
+        const leave=await Leave.findById(leaveId).populate("employeeId");
+
+        if(!leave){
+            return res.status(404).json({
+                message:"Leave application not found",
+            });
+        }
+
+        //updating status of the application
+        leave.status=status;
+        leave.approvedBy=req.user._id;
+        await leave.save();
+
+        //fetching employee email to notify
+        const employee=leave.employeeId;
+
+        if(!employee){
+            return res.status(404).json({
+                message:"Employee email not found",
+            });
+        }
+
+        if(status==="Cancelled"){
+            employee.totalLeaves=leave.leaveBalanceBefore;
+            leave.leaveBalanceAfter=leave.leaveBalanceBefore;
+            await employee.save();
+            await leave.save();
+        }
+
+        //send email notification
+        const subject=`Leave Application ${status}`;
+        const text = `Hello ${employee.fullName},\n\nYour leave application from ${leave.startDate.toDateString()} to ${leave.endDate.toDateString()} has been ${status}.\n\nReason: ${leave.reason}\n\n- Leave Management Team`;
+         const html = `
+            <p>Hello <b>${employee.fullName}</b>,</p>
+            <p>Your leave application from <b>${leave.startDate.toDateString()}</b> to <b>${leave.endDate.toDateString()}</b> has been <b>${status}</b>.</p>
+            <p><b>Reason:</b> ${leave.reason}</p>
+            <br/>
+            <p>Regards,<br/>Leave Management Team</p>
+        `;
+
+        await sendEmail(employee.email, subject, text, html);
+
+        return res.status(200).json({
+            message: `Leave ${status} successfully and email notification sent.`,
+            leave,
+        });
+    }catch(error){
+        console.log(error.message);
+        res.status(500).json({
+            message:"Internal server error in application approval route",
+        });
+    }
+}
+
 module.exports={
     handleLeaveApplication,
     handleViewLeaveApplications,
+    handleLeaveApplicationStatus,
 }
