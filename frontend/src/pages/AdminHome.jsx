@@ -1,7 +1,7 @@
 // src/pages/admin/AdminHome.jsx
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { addEmployee, getLeave } from "../service/axiosInstance";
+import { addEmployee, approveLeave, getLeave } from "../service/axiosInstance";
 
 const AdminHome = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +12,7 @@ const AdminHome = () => {
     joiningDate: "",
   });
 
-  const [leaves,setLeaves]=useState([]);
+  const [leaves, setLeaves] = useState([]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,11 +21,10 @@ const AdminHome = () => {
   const postEmployee = async (data) => {
     try {
       const res = await addEmployee(data);
-      console.log(res.data);
       toast.success(res.data?.message);
     } catch (error) {
       console.log(error.message);
-      toast.error("Something went wrong.Please try again!!");
+      toast.error("Something went wrong. Please try again!!");
     }
   };
 
@@ -41,22 +40,37 @@ const AdminHome = () => {
     });
   };
 
-  const gettingLeaveApplicationDetails=async()=>{
-    try{
-      const res=await getLeave();
-      console.log(res.data);
+  const gettingLeaveApplicationDetails = async () => {
+    try {
+      const res = await getLeave();
       setLeaves(res.data.leaves);
-    }catch(error){
+    } catch (error) {
       console.log(error.message);
     }
-  }
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     gettingLeaveApplicationDetails();
-  },[]);
+  }, []);
+
+  const handleLeaveAction = async (leaveId, status) => {
+    try {
+      const res = await approveLeave(leaveId, status);
+      if (res.data) {
+        toast.success(`Leave ${status.toLowerCase()} successfully`);
+        // Refresh the leave applications after update
+        await gettingLeaveApplicationDetails();
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to update leave status"
+      );
+    }
+  };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4">
       {/* Add Employee Form */}
       <section className="bg-white shadow-md rounded-lg p-6">
         <h2 className="text-xl font-bold mb-4">Add Employee</h2>
@@ -120,7 +134,7 @@ const AdminHome = () => {
       </section>
 
       {/* Leave Requests Table */}
-     <section className="bg-white shadow-md rounded-lg p-6 overflow-x-auto">
+      <section className="bg-white shadow-md rounded-lg p-6 overflow-x-auto">
         <h2 className="text-xl font-bold mb-4">Leave Requests</h2>
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
@@ -131,13 +145,15 @@ const AdminHome = () => {
               <th className="border px-3 py-2">End</th>
               <th className="border px-3 py-2">Days</th>
               <th className="border px-3 py-2">Status</th>
-              <th className="border px-3 py-2">Actions</th>
+              <th className="border px-3 py-2 min-w-[140px]">Actions</th>
             </tr>
           </thead>
           <tbody>
             {leaves.map((leave) => (
               <tr key={leave._id} className="text-center">
-                <td className="border px-3 py-2">{leave.employeeId.fullName}</td>
+                <td className="border px-3 py-2">
+                  {leave.employeeId.fullName}
+                </td>
                 <td className="border px-3 py-2">{leave.leaveType}</td>
                 <td className="border px-3 py-2">
                   {new Date(leave.startDate).toLocaleDateString()}
@@ -147,23 +163,29 @@ const AdminHome = () => {
                 </td>
                 <td className="border px-3 py-2">{leave.numberOfDays}</td>
                 <td className="border px-3 py-2">{leave.status}</td>
-                <td className="border px-3 py-2 flex justify-center gap-2">
-                  {leave.status === "Pending" && (
-                    <>
-                      <button
-                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
-                        onClick={() => handleLeaveAction(leave._id, "Approved")}
-                      >
-                        Approve
-                      </button>
-                      <button
-                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
-                        onClick={() => handleLeaveAction(leave._id, "Rejected")}
-                      >
-                        Reject
-                      </button>
-                    </>
-                  )}
+                <td className="border px-3 py-2">
+                  <div className="flex justify-center gap-2 flex-wrap">
+                    {leave.status === "Pending" && (
+                      <>
+                        <button
+                          className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+                          onClick={() =>
+                            handleLeaveAction(leave._id, "Approved")
+                          }
+                        >
+                          Approve
+                        </button>
+                        <button
+                          className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
+                          onClick={() =>
+                            handleLeaveAction(leave._id, "Rejected")
+                          }
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

@@ -20,3 +20,7 @@ export const addEmployee=async(data)=>{
 export const getLeave=async()=>{
     return await api.get('/leave/view_requests');
 }
+
+export const approveLeave = async (leaveId, status) => {
+    return await api.post(`/leave/update_application/${leaveId}`, { status });
+};
