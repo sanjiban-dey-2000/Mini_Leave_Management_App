@@ -1,4 +1,5 @@
 const Employee=require('../models/employeeModel');
+const sendEmail = require('../utils/sendEmail');
 
 //new employee adding handler
 async function handleAddingEmployees(req,res){
@@ -24,6 +25,18 @@ async function handleAddingEmployees(req,res){
             joiningDate,
             createdBy:req.user._id,
         });
+
+        const subject="Welcome to Leave Management System";
+        const text=`Hi ${fullName},\n\nYour account has been created.\n Email${email}.\nPlease create your password in order to login and apply for leaves.`;
+        const html=`
+            <h2>Welcome ${fullName}</h2>
+            <p>Your account has been created in the <b>Leave Management System</b>.</p>
+            <p><b>Email:</b>${email}</p>
+            <p>Use this email in order to create your password to login.</p>
+            <p>please <a href="#">Sign Up</a> to create password</p>
+        `;
+
+        await sendEmail(email,subject,text,html);
 
         res.status(201).json({
             message:"Employee added successfully",
