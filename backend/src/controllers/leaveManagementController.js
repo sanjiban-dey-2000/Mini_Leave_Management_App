@@ -174,9 +174,26 @@ async function handleViewApplicationStatus(req, res) {
   }
 }
 
+//leave balance checking controller (employee end)
+async function handleCheckLeaveBalance(req,res){
+  try{
+    const balance=await Employee.findById(req.user._id);
+    res.status(200).json({
+      message:"Leave balance fetched successfully",
+      balance,
+    });
+  }catch(error){  
+    console.log(error.message);
+    res.status(500).json({
+      message:"Internal server error in leave balance checking route",
+    })
+  }
+}
+
 module.exports = {
   handleLeaveApplication,
   handleViewLeaveApplications,
   handleLeaveApplicationStatus,
   handleViewApplicationStatus,
+  handleCheckLeaveBalance,
 };

@@ -40,3 +40,7 @@ export const applyLeave=async(data)=>{
 export const getEmployeeLeaves=async()=>{
     return await api.get('/leave/view_status');
 }
+
+export const checkBalance=async()=>{
+    return await api.get('/leave/balance');
+}

@@ -1,7 +1,7 @@
 // src/pages/employee/EmployeeHome.jsx
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { applyLeave, getEmployeeLeaves } from "../service/axiosInstance";
+import { applyLeave, checkBalance, getEmployeeLeaves} from "../service/axiosInstance";
 
 const EmployeeHome = () => {
   const [leaveData, setLeaveData] = useState({
@@ -13,6 +13,7 @@ const EmployeeHome = () => {
   });
 
   const [leaves, setLeaves] = useState([]);
+  const [leaveBalance, setLeaveBalance] = useState(null); 
 
   const handleInputChange = (e) => {
     setLeaveData({ ...leaveData, [e.target.name]: e.target.value });
@@ -21,9 +22,9 @@ const EmployeeHome = () => {
   const postLeaveApplication = async (data) => {
     try {
       const res = await applyLeave(data);
-        console.log(res.data);
       toast.success(res.data?.message);
       fetchLeaves();
+      fetchLeaveBalance(); // refresh balance after applying
     } catch (error) {
       console.log(error.message);
       toast.error("Something went wrong. Please try again!");
@@ -46,7 +47,16 @@ const EmployeeHome = () => {
     try {
       const res = await getEmployeeLeaves();
       setLeaves(res.data.leaveStatus);
-      console.log(leaves);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const fetchLeaveBalance = async () => {
+    try {
+      const res = await checkBalance(); 
+      console.log(res.data);
+      setLeaveBalance(res.data?.balance?.totalLeaves);
     } catch (error) {
       console.log(error.message);
     }
@@ -54,10 +64,20 @@ const EmployeeHome = () => {
 
   useEffect(() => {
     fetchLeaves();
+    fetchLeaveBalance();
   }, []);
 
   return (
     <div className="max-w-6xl mx-auto p-4 space-y-8">
+      {/* Leave Balance Card */}
+      <section className="bg-indigo-50 border border-indigo-200 shadow-md rounded-lg p-6 text-center">
+        <h2 className="text-lg font-bold text-indigo-700">Remaining Leave Balance</h2>
+        <p className="text-3xl font-extrabold text-indigo-900 mt-2">
+          {leaveBalance !== null ? leaveBalance : "Loading..."}
+        </p>
+        <p className="text-sm text-gray-500">days left</p>
+      </section>
+
       {/* Leave Application Form */}
       <section className="bg-white shadow-md rounded-lg p-6">
         <h2 className="text-xl font-bold mb-4">Apply for Leave</h2>
